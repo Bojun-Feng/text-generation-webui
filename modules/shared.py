@@ -127,8 +127,11 @@ parser.add_argument('--n_ctx', type=int, default=2048, help='Size of the prompt 
 parser.add_argument('--llama_cpp_seed', type=int, default=0, help='Seed for llama-cpp models. Default 0 (random)')
 
 # Xinference
-parser.add_argument('--model_uid', type=int, default=0, help='Uid for the current Xinference model. Default 0')
-parser.add_argument('--endpoint', type=int, default=9997, help='The endpoint Xinference is currently running on. Default 9997')
+parser.add_argument('--model_uid', type=str, default='0', help='Uid for the current Xinference model. Set to 0 to start new model')
+parser.add_argument('--endpoint', type=str, default='http://localhost:9997', help='The endpoint Xinference is currently running on. Default 9997')
+parser.add_argument('--xinference_model_name', type=str, default='wizardlm-v1.0', help='The name of the model you would like to start')
+parser.add_argument('--xinference_model_size', type=str, default='7', help='The size of the model you would like to start')
+parser.add_argument('--xinference_quantization', type=str, default='q2_K', help='The quantization of the model you would like to start')
 
 # GPTQ
 parser.add_argument('--wbits', type=int, default=0, help='Load a pre-quantized model with specified precision in bits. 2, 3, 4 and 8 are supported.')

@@ -70,6 +70,9 @@ loaders_and_params = {
     'xinference' : [
         'model_uid',
         'endpoint',
+        'xinference_model_name',
+        'xinference_model_size',
+        'xinference_quantization',
     ]
 }
 

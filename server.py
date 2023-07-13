@@ -119,6 +119,50 @@ def load_prompt(fname):
 
             return text
 
+def xinference_update_size(model_name):
+    options_quantization = {
+        'orca': ['q4_0', 'q4_1', 'q5_0', 'q5_1', 'q8_0'],
+        'chatglm': ['q4_0', 'q4_1', 'q5_0', 'q5_1', 'q8_0'],
+        'chatglm2': ['q4_0', 'q4_1', 'q5_0', 'q5_1', 'q8_0'],
+        'baichuan': ['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'],
+        'vicuna-v1.3': ['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'],
+        'wizardlm-v1.0': ['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'],
+    }
+    options_size = {
+        'orca': ['3', '7', '13'],
+        'chatglm': ['6'],
+        'chatglm2': ['6'],
+        'baichuan': ['7'],
+        'vicuna-v1.3': ['7', '13'],
+        'wizardlm-v1.0': ['7', '13', '33'],
+    }
+
+    new_quantization = options_quantization[model_name]
+    new_size = options_size[model_name]
+    return gr.Dropdown.update(choices=new_size, value=new_size[0])
+
+def xinference_update_quantization(model_name):
+    options_quantization = {
+        'orca': ['q4_0', 'q4_1', 'q5_0', 'q5_1', 'q8_0'],
+        'chatglm': ['q4_0', 'q4_1', 'q5_0', 'q5_1', 'q8_0'],
+        'chatglm2': ['q4_0', 'q4_1', 'q5_0', 'q5_1', 'q8_0'],
+        'baichuan': ['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'],
+        'vicuna-v1.3': ['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'],
+        'wizardlm-v1.0': ['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'],
+    }
+    options_size = {
+        'orca': ['3', '7', '13'],
+        'chatglm': ['6'],
+        'chatglm2': ['6'],
+        'baichuan': ['7'],
+        'vicuna-v1.3': ['7', '13'],
+        'wizardlm-v1.0': ['7', '13', '33'],
+    }
+
+    new_quantization = options_quantization[model_name]
+    new_size = options_size[model_name]
+    return gr.Dropdown.update(choices=new_quantization, value=new_quantization[0])
+
 
 def count_tokens(text):
     try:
@@ -227,7 +271,11 @@ def create_model_menus():
                         shared.gradio['max_seq_len'] = gr.Slider(label='max_seq_len', minimum=2048, maximum=16384, step=256, info='Maximum sequence length.', value=shared.args.max_seq_len)
                         shared.gradio['compress_pos_emb'] = gr.Slider(label='compress_pos_emb', minimum=1, maximum=8, step=1, info='Positional embeddings compression factor. Should typically be set to max_seq_len / 2048.', value=shared.args.compress_pos_emb)
                         shared.gradio['alpha_value'] = gr.Slider(label='alpha_value', minimum=1, maximum=8, step=1, info='Positional embeddings alpha factor for NTK RoPE scaling. Same as above. Use either this or compress_pos_emb, not both.', value=shared.args.alpha_value)
-                        shared.gradio['model_uid'] = gr.Number(label='model_uid', value=shared.args.model_uid)
+                        shared.gradio['xinference_model_name'] = gr.Dropdown(label="model_name", choices=['baichuan', 'chatglm', 'chatglm2', 'wizardlm-v1.0', 'vicuna-v1.3', 'orca'], value=shared.args.xinference_model_name)
+                        shared.gradio['xinference_model_size'] = gr.Dropdown(label="model_size", choices=['7', '13', '33'], value=shared.args.xinference_model_size)
+                        shared.gradio['xinference_quantization'] = gr.Dropdown(label="quantization", choices=['q2_K', 'q3_K_L', 'q3_K_M', 'q3_K_S', 'q4_0', 'q4_1', 'q4_K_M', 'q4_K_S', 'q5_0', 'q5_1', 'q5_K_M', 'q5_K_S', 'q6_K', 'q8_0'], value=shared.args.xinference_quantization)
+                        shared.gradio['xinference_model_name'].select(xinference_update_quantization, inputs=shared.gradio['xinference_model_name'], outputs=shared.gradio['xinference_quantization'])
+                        shared.gradio['xinference_quantization'].change(xinference_update_size, inputs=shared.gradio['xinference_model_name'], outputs=shared.gradio['xinference_model_size'])
                     with gr.Column():
                         shared.gradio['triton'] = gr.Checkbox(label="triton", value=shared.args.triton)
                         shared.gradio['no_inject_fused_attention'] = gr.Checkbox(label="no_inject_fused_attention", value=shared.args.no_inject_fused_attention, info='Disable fused attention. Fused attention improves inference performance but uses more VRAM. Disable if running low on VRAM.')
@@ -245,10 +293,13 @@ def create_model_menus():
                         shared.gradio['mlock'] = gr.Checkbox(label="mlock", value=shared.args.mlock)
                         shared.gradio['llama_cpp_seed'] = gr.Number(label='Seed (0 for random)', value=shared.args.llama_cpp_seed)
                         shared.gradio['trust_remote_code'] = gr.Checkbox(label="trust-remote-code", value=shared.args.trust_remote_code, info='Make sure to inspect the .py files inside the model folder before loading it with this option enabled.')
+                        shared.gradio['endpoint'] = gr.Textbox(label='endpoint (full url)', value=shared.args.endpoint)
+                        shared.gradio['model_uid'] = gr.Textbox(label='model_uid', value=shared.args.model_uid)
                         shared.gradio['gptq_for_llama_info'] = gr.Markdown('GPTQ-for-LLaMa is currently 2x faster than AutoGPTQ on some systems. It is installed by default with the one-click installers. Otherwise, it has to be installed manually following the instructions here: [instructions](https://github.com/oobabooga/text-generation-webui/blob/main/docs/GPTQ-models-(4-bit-mode).md#installation-1).')
                         shared.gradio['exllama_info'] = gr.Markdown('For more information, consult the [docs](https://github.com/oobabooga/text-generation-webui/blob/main/docs/ExLlama.md).')
                         shared.gradio['exllama_HF_info'] = gr.Markdown('ExLlama_HF is a wrapper that lets you use ExLlama like a Transformers model, which means it can use the Transformers samplers. It\'s a bit slower than the regular ExLlama.')
-                        shared.gradio['endpoint'] = gr.Number(label='endpoint', value=shared.args.endpoint)
+                        shared.gradio['xinference_info'] = gr.Markdown('Xinference supports heterogeneous hardware and distributed deployment, consult the [docs](https://github.com/xorbitsai/inference).')
+
         with gr.Column():
             with gr.Row():
                 shared.gradio['autoload_model'] = gr.Checkbox(value=shared.settings['autoload_model'], label='Autoload the model', info='Whether to load the model as soon as it is selected in the Model dropdown.')
